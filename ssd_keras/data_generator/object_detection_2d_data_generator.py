@@ -964,7 +964,7 @@ class DataGenerator:
         while True:
             batch_X, batch_y = [], []
             
-            print('printing first batch_X', np.asarray(batch_X).shape)
+            #print('printing first batch_X', np.asarray(batch_X).shape)
 
             if current >= self.dataset_size:
                 current = 0
@@ -1000,7 +1000,7 @@ class DataGenerator:
             if not (self.images is None):
                 for i in batch_indices:
                     batch_X.append(self.images[i])
-                    print('printing 2nd batch_X', np.asarray(batch_X).shape)
+                    #print('printing 2nd batch_X', np.asarray(batch_X).shape)
                 if not (self.filenames is None):
                     batch_filenames = self.filenames[current:current+batch_size]
                 else:
@@ -1008,7 +1008,7 @@ class DataGenerator:
             elif not (self.hdf5_dataset is None):
                 for i in batch_indices:
                     batch_X.append(self.hdf5_dataset['images'][i].reshape(self.hdf5_dataset['image_shapes'][i]))
-                    print('printing 3rd batch_X', np.asarray(batch_X).shape)
+                    #print('printing 3rd batch_X', np.asarray(batch_X).shape)
                 if not (self.filenames is None):
                     batch_filenames = self.filenames[current:current+batch_size]
                 else:
@@ -1018,7 +1018,7 @@ class DataGenerator:
                 for filename in batch_filenames:
                     with Image.open(filename) as image:
                         batch_X.append(np.array(image, dtype=np.uint8))
-                        print('printing 4th batch_X', np.asarray(batch_X).shape)
+                        #print('printing 4th batch_X', np.asarray(batch_X).shape)
 
             # Get the labels for this batch (if there are any).
             if not (self.labels is None):
@@ -1074,15 +1074,15 @@ class DataGenerator:
                             if ('inverse_transform' in returns) and ('return_inverter' in inspect.signature(transform).parameters):
                                 batch_X[i], batch_y[i], inverse_transform = transform(batch_X[i], batch_y[i], return_inverter=True)
                                 inverse_transforms.append(inverse_transform)
-                                print('printing fifth batch_X', np.asarray(batch_X).shape)
+                                #print('printing fifth batch_X', np.asarray(batch_X).shape)
                             else:
                                 batch_X[i], batch_y[i] = transform(batch_X[i], batch_y[i])
-                                print('printing sixth batch_X', np.asarray(batch_X).shape)
+                                #print('printing sixth batch_X', np.asarray(batch_X).shape)
 
                             if batch_X[i] is None: # In case the transform failed to produce an output image, which is possible for some random transforms.
                                 batch_items_to_remove.append(i)
                                 batch_inverse_transforms.append([])
-                                print('printing seventh batch_X', np.asarray(batch_X).shape)
+                                #print('printing seventh batch_X', np.asarray(batch_X).shape)
                                 continue
 
                         else:
@@ -1090,10 +1090,10 @@ class DataGenerator:
                             if ('inverse_transform' in returns) and ('return_inverter' in inspect.signature(transform).parameters):
                                 batch_X[i], inverse_transform = transform(batch_X[i], return_inverter=True)
                                 inverse_transforms.append(inverse_transform)
-                                print('printing eighth batch_X', np.asarray(batch_X).shape)
+                                #print('printing eighth batch_X', np.asarray(batch_X).shape)
                             else:
                                 batch_X[i] = transform(batch_X[i])
-                                print('printing ninth batch_X', np.asarray(batch_X).shape)
+                                #print('printing ninth batch_X', np.asarray(batch_X).shape)
 
                     batch_inverse_transforms.append(inverse_transforms[::-1])
 
@@ -1128,7 +1128,7 @@ class DataGenerator:
                 for j in sorted(batch_items_to_remove, reverse=True):
                     # This isn't efficient, but it hopefully shouldn't need to be done often anyway.
                     batch_X.pop(j)
-                    print('printing tenth batch_X', np.asarray(batch_X).shape)
+                    #print('printing tenth batch_X', np.asarray(batch_X).shape)
                     batch_filenames.pop(j)
                     if batch_inverse_transforms: batch_inverse_transforms.pop(j)
                     if not (self.labels is None): batch_y.pop(j)
