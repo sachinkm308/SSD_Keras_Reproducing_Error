@@ -46,9 +46,19 @@ class SSDLoss:
             alpha (float, optional): A factor to weight the localization loss in the
                 computation of the total loss. Defaults to 1.0 following the paper.
         '''
+        #'''
+        self.neg_pos_ratio = tf.constant(neg_pos_ratio)
+        self.n_neg_min = tf.constant(n_neg_min)
+        self.alpha = tf.constant(alpha)
+        #'''
+        
+        
+        '''
         self.neg_pos_ratio = neg_pos_ratio
         self.n_neg_min = n_neg_min
         self.alpha = alpha
+        '''
+        #print('printing Pos Ratio -> ', neg_pos_ratio)
 
     def smooth_L1_loss(self, y_true, y_pred):
         '''
@@ -121,10 +131,27 @@ class SSDLoss:
         Returns:
             A scalar, the total multitask loss for classification and localization.
         '''
+        
+        ''' 
+        ## commented to fix the list of tensors expected problem ##
+        
         self.neg_pos_ratio = tf.constant(self.neg_pos_ratio)
         self.n_neg_min = tf.constant(self.n_neg_min)
         self.alpha = tf.constant(self.alpha)
-
+        '''
+        
+        #self.neg_pos_ratio = tf.Variable(self.neg_pos_ratio) # Fixed list of tensors error
+        #self.n_neg_min = tf.Variable(self.n_neg_min)
+        #self.alpha = tf.Variable(self.alpha)
+        
+        print('printing neg_pos_ratio', self.neg_pos_ratio)
+        print('printing n_neg_min', self.n_neg_min)
+        print('printing alpha', self.alpha)
+        
+        #init_op = tf.variables_initializer([self.neg_pos_ratio])
+        #init_op = tf.variables_initializer([self.n_neg_min])
+        #init_op = tf.variables_initializer([self.alpha])
+        
         batch_size = tf.shape(y_pred)[0] # Output dtype: tf.int32
         n_boxes = tf.shape(y_pred)[1] # Output dtype: tf.int32, note that `n_boxes` in this context denotes the total number of boxes per image, not the number of boxes per cell.
 
@@ -163,7 +190,14 @@ class SSDLoss:
 
         # Compute the number of negative examples we want to account for in the loss.
         # We'll keep at most `self.neg_pos_ratio` times the number of positives in `y_true`, but at least `self.n_neg_min` (unless `n_neg_loses` is smaller).
+        
+        print('printing neg_pos_ratio --> ', self.neg_pos_ratio)
+        print('printing n_positive --> ', n_positive)
+        print('printing n_neg_min --> ', self.n_neg_min)
+        print('printing n_neg_losses --> ', n_neg_losses)
         n_negative_keep = tf.minimum(tf.maximum(self.neg_pos_ratio * tf.to_int32(n_positive), self.n_neg_min), n_neg_losses)
+        print('n_negative_keep = tf.minimum(tf.maximum(self.neg_pos_ratio * tf.to_int32(n_positive), self.n_neg_min), n_neg_losses)')
+        print('printing n_negative_keep --> ', n_negative_keep)
 
         # In the unlikely case when either (1) there are no negative ground truth boxes at all
         # or (2) the classification loss for all negative boxes is zero, return zero as the `neg_class_loss`.
